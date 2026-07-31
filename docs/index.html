@@ -1,808 +1,248 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Theme Park Dispatch Controller real-time systems capstone portfolio." />
-  <title>Theme Park Dispatch Controller | Real-Time Systems Capstone</title>
-
-  <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #121c2e;
-      --panel-2: #18253a;
-      --text: #eaf0f7;
-      --muted: #a9b6c8;
-      --accent: #45b6fe;
-      --accent-2: #82d173;
-      --warning: #ffcc66;
-      --danger: #ff6b6b;
-      --border: #2b3b55;
-      --max-width: 1120px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(180deg, #08101c 0%, var(--bg) 100%);
-      color: var(--text);
-      line-height: 1.65;
-    }
-
-    a {
-      color: var(--accent);
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    header {
-      border-bottom: 1px solid var(--border);
-      background: rgba(8, 16, 28, 0.96);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    nav {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0.9rem 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    nav .brand {
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    nav .links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.85rem;
-    }
-
-    nav .links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.95rem;
-    }
-
-    nav .links a:hover {
-      color: var(--text);
-    }
-
-    .hero {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 5rem 1.25rem 3.5rem;
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    .eyebrow {
-      color: var(--accent-2);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    h1 {
-      font-size: clamp(2.4rem, 6vw, 4.7rem);
-      line-height: 1.05;
-      margin: 0.5rem 0 1rem;
-    }
-
-    h2 {
-      font-size: clamp(1.7rem, 3vw, 2.5rem);
-      margin-top: 0;
-    }
-
-    h3 {
-      margin-bottom: 0.4rem;
-    }
-
-    .lead {
-      color: var(--muted);
-      font-size: 1.12rem;
-      max-width: 780px;
-    }
-
-    .hero-card,
-    .card,
-    .table-wrap,
-    .video-wrap,
-    .image-frame {
-      background: rgba(18, 28, 46, 0.95);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
-    }
-
-    .hero-card {
-      padding: 1.4rem;
-    }
-
-    .hero-card ul {
-      margin: 0;
-      padding-left: 1.2rem;
-    }
-
-    .buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      margin-top: 1.5rem;
-    }
-
-    .button {
-      display: inline-block;
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    .button.primary {
-      background: var(--accent);
-      color: #07111e;
-      border-color: var(--accent);
-    }
-
-    main {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 1.25rem 4rem;
-    }
-
-    section {
-      padding: 3.5rem 0;
-      border-top: 1px solid var(--border);
-    }
-
-    .section-intro {
-      color: var(--muted);
-      max-width: 800px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .grid.two {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .card {
-      padding: 1.25rem;
-    }
-
-    .metric {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--accent-2);
-      margin-bottom: 0.15rem;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .video-wrap {
-      overflow: hidden;
-      aspect-ratio: 16 / 9;
-    }
-
-    .video-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    .image-frame {
-      padding: 1rem;
-      overflow: hidden;
-    }
-
-    .image-frame img {
-      border-radius: 10px;
-      margin: 0 auto;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 760px;
-    }
-
-    th,
-    td {
-      padding: 0.9rem;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      color: var(--accent);
-      background: rgba(69, 182, 254, 0.08);
-    }
-
-    .status-good {
-      color: var(--accent-2);
-      font-weight: 700;
-    }
-
-    .severity-high {
-      color: var(--danger);
-      font-weight: 700;
-    }
-
-    .severity-medium {
-      color: var(--warning);
-      font-weight: 700;
-    }
-
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      background: #07101d;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem;
-      overflow-x: auto;
-      color: #d7e3f2;
-    }
-
-    code {
-      font-family: Consolas, Monaco, monospace;
-    }
-
-    .resource-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.85rem;
-    }
-
-    .resource-list a {
-      display: block;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      padding: 1rem;
-      border-radius: 12px;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 700;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 2rem 1rem 3rem;
-      border-top: 1px solid var(--border);
-    }
-
-    @media (max-width: 850px) {
-      .hero,
-      .grid,
-      .grid.two,
-      .resource-list {
-        grid-template-columns: 1fr;
-      }
-
-      header {
-        position: static;
-      }
-    }
-  </style>
+    <title>Theme Park Dispatch Controller</title>
 </head>
 
 <body>
-  <header>
-    <nav>
-      <a class="brand" href="#top">Blaine Miller · RTS Capstone</a>
-      <div class="links">
-        <a href="#overview">Overview</a>
-        <a href="#demo">Demo</a>
-        <a href="#architecture">Architecture</a>
-        <a href="#tasks">Tasks</a>
-        <a href="#hazards">Hazards</a>
-        <a href="#reflection">Reflection</a>
-        <a href="#resources">Resources</a>
-      </div>
-    </nav>
-  </header>
 
-  <div id="top" class="hero">
-    <div>
-      <div class="eyebrow">Real-Time Systems Final Capstone</div>
-      <h1>Theme Park Dispatch Controller</h1>
-      <p class="lead">
-        A FreeRTOS-based ESP32-S3 application that models a theme park emergency-stop
-        and ride-dispatch response path. The project compares a binary semaphore with
-        a direct task notification, measures ISR-to-task latency, and evaluates the
-        design under controlled processor load.
-      </p>
+<h1>Theme Park Dispatch Controller — Real-Time Systems Final Capstone</h1>
 
-      <div class="buttons">
-        <a class="button primary" href="#demo">Watch Demo</a>
-        <a class="button" href="../README.md">View Full README</a>
-        <a class="button" href="../firmware/main.c">View Source Code</a>
-      </div>
-    </div>
+<p>
+This project simulates a real-time theme park ride dispatch controller for a ride
+operator at a theme park. It demonstrates deterministic interrupt response,
+FreeRTOS synchronization, latency measurement, and system behavior under processor
+load, all of which are essential for a real-time ride control system.
+</p>
 
-    <aside class="hero-card">
-      <h3>Project Highlights</h3>
-      <ul>
-        <li>ESP32-S3 with FreeRTOS</li>
-        <li>Emergency-stop interrupt on GPIO18</li>
-        <li>Logic-analyzer pulse on GPIO19</li>
-        <li>Binary semaphore and direct notification comparison</li>
-        <li>Idle and loaded latency testing</li>
-        <li>Rate-monotonic task scheduling</li>
-        <li>Fault injection using <code>portYIELD_FROM_ISR()</code></li>
-      </ul>
-    </aside>
-  </div>
+<hr>
 
-  <main>
-    <section id="overview">
-      <h2>Project Overview</h2>
-      <p class="section-intro">
-        This project is tailored toward embedded software, ride and show control,
-        and safety-critical real-time systems roles. It demonstrates how a time-critical
-        interrupt can be kept short while deferring application work to high-priority
-        FreeRTOS tasks. The design also shows how periodic background tasks affect
-        interrupt response latency.
-      </p>
+<h2>Demo</h2>
 
-      <div class="grid">
-        <div class="card">
-          <div class="metric">30 μs</div>
-          <strong>Idle notification max</strong>
-          <p class="muted">Worst observed direct-task-notification latency with background load disabled.</p>
-        </div>
+<p>
+<b>Project Video</b><br>
+<a href="https://youtu.be/LqyWwRi0OeA">
+https://youtu.be/LqyWwRi0OeA
+</a>
+</p>
 
-        <div class="card">
-          <div class="metric">2682 μs</div>
-          <strong>Loaded notification max</strong>
-          <p class="muted">Worst observed notification latency with four periodic tasks enabled.</p>
-        </div>
+<p>
+<b>Live Wokwi</b><br>
+<a href="https://wokwi.com/projects/468085698071913473">
+Miller-A3-RTS26Summer
+</a>
+</p>
 
-        <div class="card">
-          <div class="metric">33.28%</div>
-          <strong>Total periodic utilization</strong>
-          <p class="muted">Measured WCET values with a 30% timing margin.</p>
-        </div>
-      </div>
-    </section>
+<hr>
 
-    <section id="demo">
-      <h2>Demo Video</h2>
-      <p class="section-intro">
-        Replace the YouTube video ID below with the ID from your uploaded demo.
-        For example, in <code>youtube.com/watch?v=ABC123</code>, the video ID is
-        <code>ABC123</code>.
-      </p>
+<h2>Project Overview</h2>
 
-      <div class="video-wrap">
-        <iframe
-          src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-          title="Theme Park Dispatch Controller Demo"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      </div>
+<p>
+This project demonstrates how a safety-critical ride control system responds to
+an emergency stop button. A GPIO interrupt immediately captures the event,
+records interrupt latency, and signals a bottom-half task using both a binary
+semaphore and a direct task notification.
+</p>
 
-      <div class="buttons">
-        <a class="button" href="YOUR_WOKWI_URL">Open Wokwi Simulation</a>
-        <a class="button" href="YOUR_YOUTUBE_URL">Open Video on YouTube</a>
-      </div>
-    </section>
+<p>
+The project measures ISR-to-task latency under idle and loaded CPU conditions
+to compare synchronization mechanisms while maintaining deterministic behavior.
+</p>
 
-    <section id="architecture">
-      <h2>System Architecture</h2>
-      <p class="section-intro">
-        The button on GPIO18 triggers the ISR. The ISR records a timestamp, applies
-        debounce logic, pulses GPIO19 for external measurement, and signals both
-        bottom-half tasks. The periodic load tasks run on Core 1 and create controlled
-        contention for the response path.
-      </p>
+<hr>
 
-      <div class="image-frame">
-        <img src="assets/architecture.png" alt="Theme park dispatch controller architecture diagram" />
-      </div>
+<h2>Architecture</h2>
 
-      <pre><code>Emergency Stop Button (GPIO18)
-              |
-              v
-      +-------------------+
-      | IRAM_ATTR ISR     |
-      | timestamp         |
-      | debounce          |
-      | GPIO19 pulse      |
-      +---------+---------+
-                |
-          +-----+------+
-          |            |
-          v            v
-   Binary Semaphore   Direct Notification
-          |            |
-          v            v
-   Semaphore Task    Notification Task
-       Priority 12       Priority 12
-              \          /
-               \        /
-                Core 1
+<pre>
+(Paste your ASCII architecture diagram here)
+</pre>
 
-Background Load on Core 1:
-Task A Priority 15 · Task B Priority 10
-Task C Priority 5  · Task D Priority 2</code></pre>
-    </section>
+<hr>
 
-    <section id="tasks">
-      <h2>Task Table and WCET Evidence</h2>
-      <p class="section-intro">
-        The periodic task priorities follow a rate-monotonic ladder. Dispatch Lock is
-        the highest-priority safety task, while logging has the lowest priority because
-        it is not safety critical.
-      </p>
+<h2>Task & Timing</h2>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Role</th>
-              <th>Period</th>
-              <th>Measured WCET</th>
-              <th>WCET + 30%</th>
-              <th>Priority</th>
-              <th>Core</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Dispatch Lock</td>
-              <td>Ride dispatch safety interlock</td>
-              <td>10 ms</td>
-              <td>362 μs</td>
-              <td>470 μs</td>
-              <td>15</td>
-              <td>Core 1</td>
-            </tr>
-            <tr>
-              <td>Motor Control</td>
-              <td>Drive-tire and motion-control workload</td>
-              <td>20 ms</td>
-              <td>2255 μs</td>
-              <td>2931 μs</td>
-              <td>10</td>
-              <td>Core 1</td>
-            </tr>
-            <tr>
-              <td>Operator Input</td>
-              <td>Operator-panel input processing</td>
-              <td>50 ms</td>
-              <td>3358 μs</td>
-              <td>4366 μs</td>
-              <td>5</td>
-              <td>Core 1</td>
-            </tr>
-            <tr>
-              <td>Logging</td>
-              <td>Ride event and diagnostic logging</td>
-              <td>100 ms</td>
-              <td>3993 μs</td>
-              <td>5191 μs</td>
-              <td>2</td>
-              <td>Core 1</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<table border="1" cellpadding="5">
 
-      <h3>Utilization</h3>
-      <pre><code>U = 470/10000 + 2931/20000 + 4366/50000 + 5191/100000
-U = 0.0470 + 0.1466 + 0.0873 + 0.0519
-U = 0.3328 = 33.28%</code></pre>
+<tr>
+<th>Task</th>
+<th>Period</th>
+<th>Priority</th>
+<th>Purpose</th>
+</tr>
 
-      <p>
-        The four-task Rate Monotonic sufficient bound is approximately
-        <strong>75.68%</strong>. Since <strong>33.28% &lt; 75.68%</strong>, the
-        periodic task set is schedulable under the sufficient RMS test.
-      </p>
+<tr>
+<td>GPIO ISR</td>
+<td>Event</td>
+<td>ISR</td>
+<td>Emergency Stop Detection</td>
+</tr>
 
-      <div class="image-frame">
-        <img src="assets/wcet-evidence.png" alt="Serial output or timing evidence showing measured WCET values" />
-      </div>
-    </section>
+<tr>
+<td>Notification Task</td>
+<td>Event</td>
+<td>12</td>
+<td>Measure Latency</td>
+</tr>
 
-    <section id="latency">
-      <h2>Latency Results</h2>
+<tr>
+<td>Semaphore Task</td>
+<td>Event</td>
+<td>12</td>
+<td>Measure Latency</td>
+</tr>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Run Mode</th>
-              <th>Direct Notification Maximum</th>
-              <th>Binary Semaphore Maximum</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Idle</td>
-              <td>30 μs</td>
-              <td>2410 μs</td>
-            </tr>
-            <tr>
-              <td>Under Load</td>
-              <td>2682 μs</td>
-              <td>2520 μs</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<tr>
+<td>Dispatch Lock</td>
+<td>10 ms</td>
+<td>15</td>
+<td>High Priority Load</td>
+</tr>
 
-      <p>
-        The loaded notification path increased by
-        <strong>2682 − 30 = 2652 μs</strong>, or approximately
-        <strong>89.4×</strong>. The semaphore path increased by
-        <strong>2520 − 2410 = 110 μs</strong>, or approximately
-        <strong>1.05×</strong>.
-      </p>
+<tr>
+<td>Motor Control</td>
+<td>20 ms</td>
+<td>10</td>
+<td>FIR Filter</td>
+</tr>
 
-      <p>
-        Task A runs at priority 15, while both bottom-half tasks run at priority 12.
-        Therefore, Task A can delay the bottom-half response. Tasks B, C, and D run at
-        lower priorities and cannot preempt the bottom-half tasks.
-      </p>
+<tr>
+<td>Operator Input</td>
+<td>50 ms</td>
+<td>5</td>
+<td>CRC32</td>
+</tr>
 
-      <div class="grid two">
-        <div class="image-frame">
-          <img src="assets/idle-latency.png" alt="Idle latency measurement evidence" />
-        </div>
-        <div class="image-frame">
-          <img src="assets/loaded-latency.png" alt="Loaded latency measurement evidence" />
-        </div>
-      </div>
-    </section>
+<tr>
+<td>Ride Log</td>
+<td>100 ms</td>
+<td>2</td>
+<td>Insertion Sort</td>
+</tr>
 
-    <section id="fault">
-      <h2>Fault Injection</h2>
-      <p class="section-intro">
-        The induced failure removed <code>portYIELD_FROM_ISR(higher_woken)</code>.
-        The program continued to function, but the awakened tasks were no longer
-        guaranteed to run immediately when the ISR exited.
-      </p>
+</table>
 
-      <div class="grid two">
-        <div class="card">
-          <h3>Expected Effect</h3>
-          <p>
-            The bottom-half task would wait until the scheduler naturally selected it,
-            increasing ISR-to-task response time.
-          </p>
-        </div>
+<hr>
 
-        <div class="card">
-          <h3>Observed Effect</h3>
-          <p>
-            Both handlers still executed, but latency became less predictable and more
-            inconsistent. This demonstrated degraded real-time responsiveness rather
-            than a complete functional failure.
-          </p>
-        </div>
-      </div>
-    </section>
+<h2>Utilization</h2>
 
-    <section id="hazards">
-      <h2>Hazard Analysis</h2>
+<pre>
+UA = 470 / 10000 = 0.0470
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Hazard</th>
-              <th>Possible Consequence</th>
-              <th>Severity</th>
-              <th>Mitigation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Dispatch Lock misses its deadline</td>
-              <td>A ride vehicle could be dispatched before the safe-state check completes.</td>
-              <td class="severity-high">10</td>
-              <td>Highest task priority, measured WCET, timing margin, and schedulability analysis.</td>
-            </tr>
-            <tr>
-              <td>Emergency-stop ISR is delayed</td>
-              <td>The ride may take longer to enter a safe response state.</td>
-              <td class="severity-high">10</td>
-              <td>Short IRAM ISR, no blocking calls, no dynamic allocation, and direct task notification.</td>
-            </tr>
-            <tr>
-              <td>Motor-control task overruns</td>
-              <td>Drive control may respond late or miss a control update.</td>
-              <td class="severity-high">9</td>
-              <td>WCET monitoring, bounded workload, timing margin, and deadline verification.</td>
-            </tr>
-            <tr>
-              <td>Priority inversion</td>
-              <td>A low-priority task may indirectly delay safety-critical work.</td>
-              <td class="severity-high">8</td>
-              <td>Use priority-inheritance mutexes for shared resources and minimize lock duration.</td>
-            </tr>
-            <tr>
-              <td>Button bounce causes repeated interrupts</td>
-              <td>One press may be interpreted as several emergency-stop events.</td>
-              <td class="severity-medium">5</td>
-              <td>Software debounce rejects edges occurring within 200 μs.</td>
-            </tr>
-            <tr>
-              <td>Operator input is delayed</td>
-              <td>Noncritical interface response may appear slow.</td>
-              <td class="severity-medium">4</td>
-              <td>Lower priority than dispatch and motor control while maintaining a bounded period.</td>
-            </tr>
-            <tr>
-              <td>Logging is delayed</td>
-              <td>Diagnostic records may be written late.</td>
-              <td>2</td>
-              <td>Lowest priority and nonblocking/buffered logging in a production design.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+UB = 2931 / 20000 = 0.1466
 
-      <h3>Optional Industry Mapping</h3>
-      <p>
-        In a production ride-control environment, this type of design would need to be
-        developed under the organization's applicable functional-safety, machinery,
-        amusement-device, and software-development processes. This student project is a
-        timing and architecture demonstration and is not a certified safety controller.
-      </p>
-    </section>
+UC = 4366 / 50000 = 0.0873
 
-    <section id="reflection">
-      <h2>Final Reflection</h2>
+UD = 5191 / 100000 = 0.0519
 
-      <h3>What I Would Do Differently</h3>
-      <p>
-        If I completed this project again, I would spend more time designing the full
-        architecture before writing code. I initially focused on getting each feature
-        working and then integrated the pieces afterward. Although this approach worked,
-        it created additional debugging because changes to task priorities, workload,
-        or synchronization could affect the entire timing behavior. A more detailed
-        design document containing the task model, priorities, data flow, timing budget,
-        and test plan would make the implementation process more organized.
-      </p>
+Total Utilization = 0.3328
 
-      <p>
-        I would also automate more of the data collection. The project required at least
-        fifty button presses in idle mode and another fifty under load. Automating the
-        collection and export of latency samples would make it easier to calculate the
-        maximum, average, standard deviation, and percentile values. I would also add a
-        dedicated safety-state task and separate the comparison code from the final
-        production path so only one synchronization mechanism is used in the deployed
-        design.
-      </p>
+RMS Bound = 0.7568
 
-      <h3>What Was Harder Than Expected</h3>
-      <p>
-        The hardest part was understanding why timing behavior changed under different
-        task loads. The source code could appear correct while the measured response
-        changed significantly because of priorities, preemption, and scheduler timing.
-        Small implementation details such as the placement of timestamps and the use of
-        <code>portYIELD_FROM_ISR()</code> had a visible effect on the results.
-      </p>
+0.3328 < 0.7568
 
-      <p>
-        It was also more difficult than expected to compare the binary semaphore and
-        direct notification paths fairly. Both handlers respond to the same interrupt,
-        so their order of execution and equal priorities can affect the observed latency.
-        The logic analyzer helped confirm when the ISR entered and exited, while the
-        software timestamps measured when each task began running. Using both methods
-        gave me more confidence that the behavior I observed was real.
-      </p>
+EDF Bound
 
-      <h3>Most Valuable Thing Learned</h3>
-      <p>
-        The most valuable lesson was that a real-time system is not considered correct
-        simply because it eventually produces the correct output. It must produce that
-        output within a required deadline. This project showed me why engineers keep ISRs
-        short, defer work to tasks, measure worst-case execution time, assign priorities
-        based on criticality, and verify CPU utilization.
-      </p>
+0.3328 < 1.0
+</pre>
 
-      <p>
-        I also learned the importance of validating assumptions with measured evidence.
-        Theoretical scheduling analysis showed that the periodic task set was
-        schedulable, but the latency measurements showed how a higher-priority task could
-        still delay the emergency-response path. This combination of theory, software
-        instrumentation, and logic-analyzer evidence is directly applicable to embedded
-        control and ride-and-show engineering roles.
-      </p>
-    </section>
+<hr>
 
-    <section id="production">
-      <h2>What Scales to Production</h2>
+<h2>Hazard Analysis</h2>
 
-      <div class="grid two">
-        <div class="card">
-          <h3>Current Strengths</h3>
-          <ul>
-            <li>Short, nonblocking ISR design</li>
-            <li>Priority assignment based on criticality</li>
-            <li>Measured WCET and utilization</li>
-            <li>External timing evidence</li>
-            <li>Fault-injection testing</li>
-          </ul>
-        </div>
+<table border="1" cellpadding="5">
 
-        <div class="card">
-          <h3>Next Steps</h3>
-          <ul>
-            <li>Use real hardware and a physical emergency-stop circuit</li>
-            <li>Add watchdog and safe-state supervision</li>
-            <li>Separate safety and diagnostic communication paths</li>
-            <li>Collect statistical latency data automatically</li>
-            <li>Add requirements traceability and formal verification evidence</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+<tr>
+<th>Hazard</th>
+<th>Severity</th>
+<th>Mitigation</th>
+</tr>
 
-    <section id="resources">
-      <h2>Resources</h2>
-      <p class="section-intro">
-        Replace the placeholder URLs below before submission.
-      </p>
+<tr>
+<td>Dispatch deadline missed</td>
+<td>10</td>
+<td>Highest priority task</td>
+</tr>
 
-      <div class="resource-list">
-        <a href="../README.md">Full README</a>
-        <a href="../firmware/main.c">Source Code</a>
-        <a href="YOUR_WOKWI_URL">Wokwi Simulation</a>
-        <a href="YOUR_YOUTUBE_URL">YouTube Demo</a>
-        <a href="YOUR_GITHUB_REPOSITORY_URL">GitHub Repository</a>
-        <a href="report.pdf">Download Final Report</a>
-      </div>
-    </section>
-  </main>
+<tr>
+<td>ISR delayed</td>
+<td>10</td>
+<td>Keep ISR short</td>
+</tr>
 
-  <footer>
-    <p>
-      Theme Park Dispatch Controller · Real-Time Systems Final Capstone · Blaine Miller
-    </p>
-  </footer>
+<tr>
+<td>Motor overrun</td>
+<td>9</td>
+<td>Measure WCET</td>
+</tr>
+
+<tr>
+<td>Operator delay</td>
+<td>4</td>
+<td>Lower priority</td>
+</tr>
+
+<tr>
+<td>Logging delayed</td>
+<td>2</td>
+<td>Lowest priority</td>
+</tr>
+
+<tr>
+<td>Button bounce</td>
+<td>5</td>
+<td>Software debounce</td>
+</tr>
+
+<tr>
+<td>Priority inversion</td>
+<td>8</td>
+<td>Priority inheritance mutex</td>
+</tr>
+
+</table>
+
+<hr>
+
+<h2>Build & Run</h2>
+
+<h3>Hardware</h3>
+
+<ul>
+<li>ESP32-S3 DevKitC-1</li>
+<li>Pushbutton on GPIO18</li>
+<li>GPIO19 Pulse Output</li>
+<li>Wokwi Simulator</li>
+</ul>
+
+<h3>Software</h3>
+
+<ul>
+<li>ESP-IDF</li>
+<li>FreeRTOS</li>
+<li>PlatformIO</li>
+<li>Wokwi</li>
+</ul>
+
+<hr>
+
+<h2>Tailored For</h2>
+
+<p>
+This project is tailored toward Controls Engineering and Hardware Engineering
+roles. It demonstrates interrupt handling, real-time scheduling, synchronization,
+timing analysis, fault injection, and deterministic embedded software design.
+</p>
+
+<hr>
+
+<h2>Resources</h2>
+
+<ul>
+<li><a href="../README.md">README</a></li>
+<li><a href="../firmware/main.c">Source Code</a></li>
+<li><a href="https://youtu.be/LqyWwRi0OeA">Demo Video</a></li>
+<li><a href="https://wokwi.com/projects/468085698071913473">Live Wokwi</a></li>
+</ul>
+
 </body>
 </html>
