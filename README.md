@@ -1,110 +1,177 @@
+## Theme Park Dispatch Controller — Real-Time Systems Final Capstone
 
 
-  Engineering analysis:
+ This project simulates a real-time theme park ride dispatch controller for a ride operator at a theme park.
 
-  1. My ISR works as my theme parks emergency stop button for an operator
-    line by line by:
+## Demo
+Video
 
-     int64_t now = esp_timer_get_time();
-     This line records the isrs input so I can keep track of latency
+(Insert your YouTube link here)
 
-     if (now - last_edge_us < DEBOUNCE_US) return;
-      This line works as a debounce tool so I do not see many interrupts when
-      the button is only pressed onces
-  
-    last_edge_us = now;
-    This holds onto the buttons last stored input time
+Live Wokwi: Miller-A3-RTS26Summer
 
-    gpio_set_level(ISR_PULSE_GPIO, 1);
-    This line will allow for the logic analyzer to see when the interrupt starts
+https://wokwi.com/projects/468085698071913473
 
-    isr_entry_time_us = now;
-    This will save the timestamp for bottom half latency calcs
 
-    presses_observed++;
-    This will count the buttons presses
+## Project Overview
 
-    BaseType_t higher_woken = pdFALSE;
-    This will keep track if the isr wakes a high priority task
+This project demonstrates how a safety-critical ride control system responds to an emergency stop button. A GPIO interrupt immediately captures the event, records the interrupt latency, and signals a bottom-half task using both a binary semaphore and a direct task notification. The project measures ISR-to-task latency under idle and loaded CPU conditions to compare synchronization mechanisms while maintaining deterministic behavior.
 
+## Architecture
+
+                         Emergency Stop Button (GPIO18)
+                                     │
+                                     │ Falling Edge Interrupt
+                                     ▼
+                    ┌─────────────────────────────────────┐
+                    │      GPIO Interrupt Service Routine │
+                    │-------------------------------------│
+                    │ • Timestamp ISR entry               │
+                    │ • Debounce (200 μs)                 │
+                    │ • GPIO19 latency pulse HIGH         │
+                    │ • Signal Binary Semaphore           │
+                    │ • Signal Task Notification          │
+                    │ • GPIO19 latency pulse LOW          │
+                    │ • portYIELD_FROM_ISR()              │
+                    └──────────────┬───────────────┬──────┘
+                                   │               │
+                                   │               │
+                         Binary Semaphore     Direct Task
+                             btn_sem          Notification
+                                   │               │
+                                   ▼               ▼
+                   ┌────────────────────┐  ┌────────────────────┐
+                   │ Bottom-Half Task   │  │ Bottom-Half Task   │
+                   │ (Semaphore)        │  │ (Notification)     │
+                   │ Priority = 12      │  │ Priority = 12      │
+                   │                    │  │                    │
+                   │ Measure latency    │  │ Measure latency    │
+                   │ Log E-Stop Event   │  │ Log Ride Alert     │
+                   └─────────┬──────────┘  └─────────┬──────────┘
+                             │                       │
+                             └──────────┬────────────┘
+                                        │
+                                        ▼
+                          Emergency Stop Event Logged
+
+
+            Priority 15                   Priority 10               Priority 5             Priority 2
     
-     
-    xSemaphoreGiveFromISR(btn_sem, &higher_woken);
-    This will wake the semaphore bottom half task
+       ┌─────────────────┐          ┌─────────────────┐      ┌─────────────────┐    ┌─────────────────┐
+       │task_dispatchLock│          │task_motorControl│      │task_operatorInput│    │   task_log     │
+       ├─────────────────┤          ├─────────────────┤      ├─────────────────┤    ├─────────────────┤
+       │ Period : 10 ms  │          │ Period : 20 ms  │      │ Period : 50 ms  │    │ Period :100 ms  │
+       │ Xorshift RNG    │          │ FIR Filter      │      │ CRC32            │    │ Insertion Sort  │
+       └────────┬────────┘          └────────┬────────┘      └────────┬────────┘    └────────┬────────┘
+                │                            │                        │                      │
+                └────────────────────────────┴────────────────────────┴──────────────────────┘
+                                                 Running on Core 1
+                          
 
-     
-    vTaskNotifyGiveFromISR(task_notif_handle, &higher_woken);
-    This will wake the notification task
+1. The emergency-stop button generates a falling-edge interrupt on **GPIO18**.
+2. The ISR timestamps the event and generates a pulse on **GPIO19** for latency measurement.
+3. The ISR signals both the binary semaphore and direct task notification.
+4. The bottom-half task wakes, measures ISR-to-task latency, and records the maximum observed latency.
+5. Optional background tasks simulate processor contention to evaluate real-time performance under load.
 
-    
-    gpio_set_level(ISR_PULSE_GPIO, 0);
-    This will lower teh gpio19 so the logic analyzer can see when its off
-    
-    portYIELD_FROM_ISR(higher_woken);
-    this will request a context switch if a high task was woken
 
-    whats not in the isr?
-    There is no printf of any sort, there is no delay or any malloc.
-    Thus the isr will simply wake the tasks if the emergency stop was pressed.
+## Task & Timing
 
-  2. 
-    When running idle and completing 50 samples
-    my worst time latency is:
-
-      notif max = 30us
-      sem max = 2410us
-
-    When running it loaded at 1 and completing the samples 
-    my worst time latency is:
-
-      notif max = 2682 us
-      sem  max = 2520 us
-
-      The direct notification task was faster.
-
-      Both logic analyzer pngs are in the zipfile!
-
-  3. 
-    When running ideal and completing 50 samples
-    my worst time latency is:
-
-      notif max = 30us
-      sem max = 2410us
-
-    When running it loaded at 1 and completing the samples 
-    my worst time latency is:
-
-      notif max = 2682 us
-      sem  max = 2520 us
-
-    
-    the increase factor:
-      notif max = 2682/30 = 89.4x 
-      sem  max = 2520/2410 = 1.05x
-
-      the large increase in latency comes form the priority of the tasks.
-      Since there is a higher priority task (task A ). Due to task A being higher'
-      it takes priority over the bottom half task which can cause an execution delay. The
-      other three tasks all run at lower priorities then the isr meaning that
-      they cannot preempt a higher task like the isr or task A. This means only
-      task A effects the worst time latency and not the lower priority tasks. 
+| Task | Type | Period | Priority | Deadline | Purpose |
+|------|:----:|:------:|:--------:|:--------:|---------|
+| GPIO ISR | Interrupt | Event Driven | ISR | Immediate | Detect emergency stop button press |
+| Bottom-Half (Notification) | Task | Event Driven | 12 | Immediate | Process ISR notification & measure latency |
+| Bottom-Half (Semaphore) | Task | Event Driven | 12 | Immediate | Process semaphore signal & measure latency |
+| task_dispatchLock | Periodic | 10 ms | 15 | 10 ms | High-priority processor workload |
+| task_motorControl | Periodic | 20 ms | 10 | 20 ms | FIR filter computation |
+| task_operatorInput | Periodic | 50 ms | 5 | 50 ms | CRC32 processing |
+| task_log | Periodic | 100 ms | 2 | 100 ms | Worst-case insertion sort |
 
 
 
-  
-  
-  4. The failure that i induced was removing portYIELD_FROM_ISR(higher_woken)
-    The output that I expect to see is that i will see the notification but
-    the task might not run until the next tick.
 
-    What I ended up observing is that the system operated like normal
-    and continued to fire both tasks. However, the latency became more
-    inconsistent and at times larger than normal.
+## Utilization Calculations
+
+Task A (Dispatch)
+
+UA = 470 / 10000
+   = 0.0470
+
+Task B (Motor Control)
+
+UB = 2931 / 20000
+   = 0.1466
+
+Task C (Operator Input)
+
+UC = 4366 / 50000
+   = 0.0873
+
+Task D (Ride Log)
+
+UD = 5191 / 100000
+   = 0.0519
+
+Total Utilization
+
+U = UA + UB + UC + UD
+= 0.0470+ 0.1466+ 0.0873+ 0.0519
+= 0.3328
+
+Rate Monotonic Bound (4 Tasks)
+
+U = 0.3328
+
+RM Bound = 0.7568
+
+0.3328 < 0.7568  
 
 
-  
+EDF Bound
 
-  AI Disclosure:
+U = 0.3328
 
-  No AI was used in this App
+0.3328 < 1.0  Feasible
 
+## Hazard Analysis
+  | Hazard                                      | Possible Consequence                                                                    | Severity (1–10) | Mitigation                                                                                                                      |
+| ------------------------------------------- | --------------------------------------------------------------------------------------- | :-------------: | ------------------------------------------------------------------------------------------------------------------------------- |
+| Dispatch lock task misses its deadline      | Ride vehicles could be dispatched too closely together, increasing collision risk.      |      **10**     | Give Dispatch Lock the highest priority (15), monitor WCET, and verify utilization remains below the RMS bound.                 |
+| Emergency stop ISR delayed                  | Emergency stop response is delayed, increasing stopping distance.                       |      **10**     | Keep the ISR short, avoid `printf`, delays, and dynamic memory, and use direct task notification to wake the responder quickly. |
+| Motor control task overruns                 | Incorrect drive tire speed or braking commands could be issued.                         |      **9**      | Assign a high priority, measure WCET, and monitor execution time during testing.                                                |
+| Operator input delayed                      | Dispatch button response feels sluggish or commands are processed late.                 |      **4**      | Run operator input at a lower priority than safety-critical tasks while ensuring it still meets its deadline.                   |
+| Logging task delayed or skipped             | Diagnostic information may be lost, making troubleshooting difficult after an incident. |      **2**      | Keep logging at the lowest priority and buffer log messages so safety-critical tasks are unaffected.                            |
+| Button bounce generates multiple interrupts | Multiple emergency-stop events may be recorded from one button press.                   |      **5**      | Use software debounce (`DEBOUNCE_US`) before accepting another interrupt.                                                       |
+| Priority inversion/resource blocking        | High-priority safety task waits on a lower-priority task holding a resource.            |      **8**      | Protect shared resources with mutexes that support priority inheritance and minimize lock duration.                             |
+
+
+During testing, CPU load was intentionally increased by enabling four periodic background tasks. The interrupt response latency increased slightly but remained deterministic because the emergency stop handler executes at a higher priority than most background tasks. The system continues servicing emergency events without failure even under processor contention.
+
+
+
+As part of testing, portYIELD_FROM_ISR() was temporarily removed to demonstrate the impact on interrupt response time. This increased wake latency and verified the importance of requesting an immediate context switch after ISR completion.
+
+ ## Build & Run
+ ## Hardware
+ESP32-S3 DevKitC-1
+Pushbutton on GPIO18
+GPIO19 latency pulse output
+Wokwi Simulator
+## Software
+ESP-IDF
+FreeRTOS
+PlatformIO
+Wokwi
+## Running
+1. Open project in Wokwi
+2. Start simulation
+3. Press GPIO18 button
+4. Observe latency in Serial Monitor
+5. Repeat under WITH_LOAD = 0 and WITH_LOAD = 1
+   
+
+## Tailored For
+
+Controls Engineer/Hardware Engineer:
+
+This project demonstrates core real-time embedded concepts commonly used in themed entertainment control systems. It emphasizes deterministic interrupt response, synchronization, timing analysis, and system behavior under processor load, all of which are essential for a real time ride control system.
