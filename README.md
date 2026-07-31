@@ -4,9 +4,8 @@
  This project simulates a real-time theme park ride dispatch controller for a ride operator at a theme park.
 
 ## Demo
-Video
-
-(Insert your YouTube link here)
+Video With my project demo
+https://youtu.be/LqyWwRi0OeA
 
 Live Wokwi: Miller-A3-RTS26Summer
 
