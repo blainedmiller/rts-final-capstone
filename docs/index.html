@@ -54,7 +54,60 @@ to compare synchronization mechanisms while maintaining deterministic behavior.
 <h2>Architecture</h2>
 
 <pre>
-(Paste your ASCII architecture diagram here)
+                       Emergency Stop Button (GPIO18)
+                                     │
+                                     │ Falling Edge Interrupt
+                                     ▼
+                    ┌─────────────────────────────────────┐
+                    │      GPIO Interrupt Service Routine │
+                    │-------------------------------------│
+                    │ • Timestamp ISR entry               │
+                    │ • Debounce (200 μs)                 │
+                    │ • GPIO19 latency pulse HIGH         │
+                    │ • Signal Binary Semaphore           │
+                    │ • Signal Task Notification          │
+                    │ • GPIO19 latency pulse LOW          │
+                    │ • portYIELD_FROM_ISR()              │
+                    └──────────────┬───────────────┬──────┘
+                                   │               │
+                                   │               │
+                         Binary Semaphore     Direct Task
+                             btn_sem          Notification
+                                   │               │
+                                   ▼               ▼
+                   ┌────────────────────┐  ┌────────────────────┐
+                   │ Bottom-Half Task   │  │ Bottom-Half Task   │
+                   │ (Semaphore)        │  │ (Notification)     │
+                   │ Priority = 12      │  │ Priority = 12      │
+                   │                    │  │                    │
+                   │ Measure latency    │  │ Measure latency    │
+                   │ Log E-Stop Event   │  │ Log Ride Alert     │
+                   └─────────┬──────────┘  └─────────┬──────────┘
+                             │                       │
+                             └──────────┬────────────┘
+                                        │
+                                        ▼
+                          Emergency Stop Event Logged
+
+
+            Priority 15                   Priority 10               Priority 5             Priority 2
+    
+       ┌─────────────────┐          ┌─────────────────┐      ┌─────────────────┐    ┌─────────────────┐
+       │task_dispatchLock│          │task_motorControl│      │task_operatorInput│    │   task_log     │
+       ├─────────────────┤          ├─────────────────┤      ├─────────────────┤    ├─────────────────┤
+       │ Period : 10 ms  │          │ Period : 20 ms  │      │ Period : 50 ms  │    │ Period :100 ms  │
+       │ Xorshift RNG    │          │ FIR Filter      │      │ CRC32            │    │ Insertion Sort  │
+       └────────┬────────┘          └────────┬────────┘      └────────┬────────┘    └────────┬────────┘
+                │                            │                        │                      │
+                └────────────────────────────┴────────────────────────┴──────────────────────┘
+                                                 Running on Core 1
+                          
+
+1. The emergency-stop button generates a falling-edge interrupt on **GPIO18**.
+2. The ISR timestamps the event and generates a pulse on **GPIO19** for latency measurement.
+3. The ISR signals both the binary semaphore and direct task notification.
+4. The bottom-half task wakes, measures ISR-to-task latency, and records the maximum observed latency.
+5. Optional background tasks simulate processor contention to evaluate real-time performance under load.
 </pre>
 
 <hr>
