@@ -1,43 +1,32 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Park Dispatch Controller</title>
+</head>
+<body>
+    <h1>Theme Park Dispatch Controller</h1>
+    <h2>Real-Time Systems Final Capstone</h2>
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    <p>
+        This project simulates a real-time theme park ride dispatch controller
+        using an ESP32-S3 and FreeRTOS.
+    </p>
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    <h2>Project Features</h2>
+    <ul>
+        <li>Emergency-stop interrupt on GPIO18</li>
+        <li>Binary semaphore and direct task notification comparison</li>
+        <li>Interrupt-latency measurement</li>
+        <li>Rate-monotonic task scheduling</li>
+        <li>Background-load testing</li>
+    </ul>
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+    <h2>Results</h2>
+    <p>Idle notification maximum latency: 30 microseconds.</p>
+    <p>Loaded notification maximum latency: 2682 microseconds.</p>
+    <p>Total periodic-task utilization: 33.28%.</p>
+</body>
+</html>
